@@ -1,0 +1,52 @@
+# ============================================================
+#  BDA Portal — Docker Compose (local dev / smoke test)
+#
+#  Usage:
+#    docker compose up --build
+#
+#  Open: http://localhost:8080
+#  Login: admin@bda.com / Admin@123
+# ============================================================
+
+version: "3.9"
+
+services:
+
+  backend:
+    build:
+      context: .                                  # project root
+      dockerfile: dockerfiles/Dockerfile.backend  # separate Dockerfile
+    container_name: bda-backend
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DB_PATH: /data/bda_portal.db
+      JWT_SECRET: dev-secret-change-for-prod
+    volumes:
+      - db_data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .                                   # project root
+      dockerfile: dockerfiles/Dockerfile.frontend  # separate Dockerfile
+    container_name: bda-frontend
+    ports:
+      - "8080:80"
+    environment:
+      BDA_API_URL: "http://localhost:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  db_data:

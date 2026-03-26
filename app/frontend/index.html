@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BDA Portal — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --border: rgba(255,255,255,0.07);
+      --accent: #5b6af5;
+      --accent2: #00d4aa;
+      --text: #f0f0f5;
+      --muted: #6b6b80;
+      --error: #ff4d6d;
+      --radius: 14px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 50%, rgba(91,106,245,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,212,170,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .grid-lines {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 44px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+      animation: slideUp .5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+    .logo-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .logo-text { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+    .logo-sub  { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+
+    .field { margin-bottom: 18px; }
+    label  { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.3px; }
+    input  {
+      width: 100%; padding: 13px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      transition: border-color .2s, background .2s;
+      outline: none;
+    }
+    input:focus {
+      border-color: var(--accent);
+      background: rgba(91,106,245,0.06);
+    }
+
+    .error-box {
+      background: rgba(255,77,109,0.1);
+      border: 1px solid rgba(255,77,109,0.25);
+      color: var(--error);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      display: none;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent) 0%, #7b88ff 100%);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: opacity .2s, transform .15s;
+      margin-top: 6px;
+      position: relative;
+    }
+    .btn-login:hover  { opacity: .9; transform: translateY(-1px); }
+    .btn-login:active { transform: translateY(0); }
+    .btn-login.loading { opacity: .7; pointer-events: none; }
+
+    .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+    .demo-section h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+    .demo-row {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .demo-badge {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      color: var(--muted);
+    }
+    .demo-badge:hover { border-color: var(--accent); color: var(--text); background: rgba(91,106,245,0.08); }
+    .demo-badge span  { color: var(--accent); font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="grid-lines"></div>
+
+  <div class="card">
+    <div class="logo">
+      <div class="logo-icon">🎯</div>
+      <div>
+        <div class="logo-text">BDA Portal</div>
+        <div class="logo-sub">Business Data Analytics</div>
+      </div>
+    </div>
+
+    <h1>Welcome back</h1>
+    <p class="subtitle">Sign in to your analytics workspace</p>
+
+    <div id="error-box" class="error-box"></div>
+
+    <div class="field">
+      <label for="email">Email address</label>
+      <input type="email" id="email" placeholder="you@bda.com" autocomplete="email" />
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+
+    <button id="login-btn" class="btn-login" onclick="doLogin()">Sign In →</button>
+
+    <div class="divider"></div>
+
+    <div class="demo-section">
+      <h4>Quick login (demo)</h4>
+      <div class="demo-row">
+        <div class="demo-badge" onclick="fill('admin@bda.com')">🛡️ <span>Admin</span></div>
+        <div class="demo-badge" onclick="fill('john@bda.com')">📋 <span>Manager</span></div>
+        <div class="demo-badge" onclick="fill('jane@bda.com')">📊 <span>Analyst</span></div>
+        <div class="demo-badge" onclick="fill('bob@bda.com')">👁️ <span>Viewer</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = (window.BDA_API_URL || '').replace(/\/$/, '');
+
+    function fill(email) {
+      document.getElementById('email').value = email;
+      document.getElementById('password').value = 'Admin@123';
+      document.getElementById('email').focus();
+    }
+
+    async function doLogin() {
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const errBox   = document.getElementById('error-box');
+      const btn      = document.getElementById('login-btn');
+
+      errBox.style.display = 'none';
+      if (!email || !password) {
+        errBox.textContent = 'Please enter your email and password.';
+        errBox.style.display = 'block';
+        return;
+      }
+
+      btn.textContent = 'Signing in…';
+      btn.classList.add('loading');
+
+      try {
+        const res  = await fetch(`${API}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('bda_token', data.token);
+          localStorage.setItem('bda_user',  JSON.stringify(data.user));
+          window.location.href = '/dashboard.html';
+        } else {
+          errBox.textContent   = data.message || 'Login failed';
+          errBox.style.display = 'block';
+          btn.textContent      = 'Sign In →';
+          btn.classList.remove('loading');
+        }
+      } catch (e) {
+        errBox.textContent   = 'Cannot reach server. Check API URL configuration.';
+        errBox.style.display = 'block';
+        btn.textContent      = 'Sign In →';
+        btn.classList.remove('loading');
+      }
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  </script>
+</body>
+</html>

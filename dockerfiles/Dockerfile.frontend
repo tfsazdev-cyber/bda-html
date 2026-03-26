@@ -1,0 +1,37 @@
+# ============================================================
+#  BDA Portal — Frontend Dockerfile
+#  Location : dockerfiles/Dockerfile.frontend
+#  App code  : app/frontend/
+#
+#  Build command (run from project root):
+#    docker build -f dockerfiles/Dockerfile.frontend -t bda-frontend:latest .
+#
+#  Runtime env var:
+#    BDA_API_URL  — backend URL injected into HTML at container start
+#    e.g.  docker run -e BDA_API_URL=http://backend:3000 ...
+# ============================================================
+
+FROM nginx:1.25-alpine
+
+# Remove default nginx site
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy custom nginx config
+COPY app/frontend/nginx.conf /etc/nginx/conf.d/bda.conf
+
+# Copy HTML pages
+COPY app/frontend/index.html     /usr/share/nginx/html/index.html
+COPY app/frontend/dashboard.html /usr/share/nginx/html/dashboard.html
+
+# Copy entrypoint that injects BDA_API_URL into HTML at startup
+COPY app/frontend/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 80
+
+ENV BDA_API_URL=""
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost/healthz || exit 1
+
+ENTRYPOINT ["/entrypoint.sh"]

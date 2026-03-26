@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bda-db-pvc
+  namespace: bda-portal
+  labels:
+    app: bda-backend
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  # storageClassName: gp2      # ← uncomment on AWS EKS
+  # storageClassName: standard # ← uncomment on minikube / local
